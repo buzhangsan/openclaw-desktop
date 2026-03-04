@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+/dist/
+
+# Tauri
+/src-tauri/target/
+/src-tauri/WixTools/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+*.exe
+*.msi
+*.dmg
+*.deb
+*.AppImage
