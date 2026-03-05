@@ -153,6 +153,15 @@ section h2 {
   background: var(--success-hover);
 }
 
+.btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #475569;
+}
+
 .btn-danger {
   background: var(--danger);
   color: white;

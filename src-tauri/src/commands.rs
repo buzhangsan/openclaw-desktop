@@ -99,6 +99,61 @@ fn try_repair_windows_node_path() {
     // no-op on non-Windows
 }
 
+#[cfg(target_os = "windows")]
+fn persist_windows_node_path_internal() -> Result<String, String> {
+    let candidates: Vec<String> = get_windows_node_path_candidates()
+        .into_iter()
+        .filter(|p| {
+            let node_exe = PathBuf::from(p).join("node.exe");
+            let npm_cmd = PathBuf::from(p).join("npm.cmd");
+            node_exe.exists() || npm_cmd.exists()
+        })
+        .collect();
+
+    if candidates.is_empty() {
+        return Ok("未找到可写入 PATH 的 Node.js 目录".to_string());
+    }
+
+    let quoted_candidates = candidates
+        .iter()
+        .map(|p| format!("'{}'", p.replace('"', "\\\"").replace('\'', "''")))
+        .collect::<Vec<_>>()
+        .join(",");
+
+    let ps_script = format!(
+        "$candidates=@({}); \
+        $userPath=[Environment]::GetEnvironmentVariable('Path','User'); \
+        if([string]::IsNullOrWhiteSpace($userPath)){{$userPath=''}}; \
+        $parts=@($userPath -split ';' | Where-Object {{$_ -and $_.Trim() -ne ''}}); \
+        foreach($c in $candidates){{ if(-not ($parts | Where-Object {{ $_.ToLower() -eq $c.ToLower() }})){{$parts += $c}} }}; \
+        $newPath=($parts -join ';'); \
+        [Environment]::SetEnvironmentVariable('Path',$newPath,'User'); \
+        Write-Output $newPath",
+        quoted_candidates
+    );
+
+    let output = Command::new("powershell")
+        .args(["-NoProfile", "-Command", &ps_script])
+        .output()
+        .map_err(|e| format!("写入用户 PATH 失败: {}", e))?;
+
+    if output.status.success() {
+        // Also refresh current process PATH
+        try_repair_windows_node_path();
+        Ok("已写入用户 PATH（重开终端后对新进程生效）".to_string())
+    } else {
+        Err(format!(
+            "写入用户 PATH 失败: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn persist_windows_node_path_internal() -> Result<String, String> {
+    Err("仅 Windows 支持此功能".to_string())
+}
+
 /// Get the Node.js executable path (system or embedded)
 fn get_node_executable() -> String {
     // First check if embedded node is available
@@ -303,6 +358,12 @@ pub async fn setup_embedded_node() -> Result<String, String> {
     
     // Return instruction for now - actual download would be implemented here
     Ok("Please download Node.js portable version manually".to_string())
+}
+
+/// Persist Node.js/npm paths into Windows user PATH
+#[tauri::command]
+pub async fn persist_windows_node_path() -> Result<String, String> {
+    persist_windows_node_path_internal()
 }
 
 /// Install OpenClaw via npm

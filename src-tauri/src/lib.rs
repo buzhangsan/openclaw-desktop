@@ -16,6 +16,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::check_system_status,
             commands::setup_embedded_node,
+            commands::persist_windows_node_path,
             commands::install_openclaw,
             commands::start_gateway,
             commands::stop_gateway,

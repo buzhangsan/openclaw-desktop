@@ -79,6 +79,21 @@ function App() {
     }
   };
 
+  // 持久化写入 Windows 用户 PATH
+  const persistWindowsPath = async () => {
+    setInstalling(true);
+    addLog("正在写入用户 PATH...");
+    try {
+      const msg = await invoke<string>("persist_windows_node_path");
+      addLog(`✅ ${msg}`);
+      await checkStatus();
+    } catch (e) {
+      addLog(`❌ 写入 PATH 失败: ${e}`);
+    } finally {
+      setInstalling(false);
+    }
+  };
+
   // 启动 Gateway
   const startGateway = async () => {
     addLog("启动 Gateway...");
@@ -186,6 +201,11 @@ function App() {
                 {!status?.openclaw_installed && (status?.npm_installed || status?.embedded_node_ready) && (
                   <button className="btn btn-primary" onClick={installOpenClaw} disabled={installing}>
                     {installing ? "安装中..." : "安装 OpenClaw"}
+                  </button>
+                )}
+                {!status?.npm_installed && !status?.embedded_node_ready && (
+                  <button className="btn btn-secondary" onClick={persistWindowsPath} disabled={installing}>
+                    {installing ? "处理中..." : "修复 PATH（Windows）"}
                   </button>
                 )}
                 {status?.openclaw_installed && (
@@ -314,6 +334,11 @@ function App() {
                     title={!status?.npm_installed && !status?.embedded_node_ready ? "需要 npm 或内嵌 Node.js" : ""}
                   >
                     {installing ? "安装中..." : "安装 OpenClaw"}
+                  </button>
+                )}
+                {!status?.npm_installed && !status?.embedded_node_ready && (
+                  <button className="btn btn-secondary" onClick={persistWindowsPath} disabled={installing}>
+                    {installing ? "处理中..." : "修复 PATH（Windows）"}
                   </button>
                 )}
                 {status?.openclaw_installed && !status?.gateway_running && (
