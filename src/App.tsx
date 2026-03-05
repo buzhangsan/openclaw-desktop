@@ -66,6 +66,13 @@ function App() {
   // Setup step
   const [setupStep, setSetupStep] = useState(1);
 
+  const [diagRunning, setDiagRunning] = useState(false);
+  const [diagResult, setDiagResult] = useState<{
+    gateway: "unknown" | "pass" | "fail";
+    channel: "unknown" | "pass" | "fail";
+    agent: "unknown" | "pass" | "fail";
+  }>({ gateway: "unknown", channel: "unknown", agent: "unknown" });
+
   // 检查系统状态
   const checkStatus = async () => {
     try {
@@ -251,6 +258,40 @@ function App() {
       addLog(`❌ Channel 配置失败: ${e}`);
     } finally {
       setInstalling(false);
+    }
+  };
+
+  const runDiagnostics = async () => {
+    setDiagRunning(true);
+    try {
+      // 1) gateway
+      let gatewayPass = false;
+      try {
+        const running = await invoke<boolean>("get_gateway_status");
+        gatewayPass = !!running;
+      } catch {
+        gatewayPass = false;
+      }
+
+      // 2) channel (basic: token exists)
+      const channelPass = !!channelToken.trim();
+
+      // 3) agent (basic: name exists)
+      const agentPass = !!agentName.trim();
+
+      setDiagResult({
+        gateway: gatewayPass ? "pass" : "fail",
+        channel: channelPass ? "pass" : "fail",
+        agent: agentPass ? "pass" : "fail",
+      });
+
+      addLog(
+        `诊断结果: gateway=${gatewayPass ? "pass" : "fail"}, channel=${
+          channelPass ? "pass" : "fail"
+        }, agent=${agentPass ? "pass" : "fail"}`
+      );
+    } finally {
+      setDiagRunning(false);
     }
   };
 
@@ -584,6 +625,34 @@ function App() {
                     </button>
                   </>
                 )}
+              </div>
+            </section>
+
+            {/* 验证中心 */}
+            <section className="status-panel">
+              <h2>验证中心</h2>
+              <div className="button-group" style={{ marginBottom: 12 }}>
+                <button className="btn btn-secondary" onClick={runDiagnostics} disabled={diagRunning}>
+                  {diagRunning ? "诊断中..." : "运行完整诊断"}
+                </button>
+              </div>
+
+              <div className="status-grid">
+                <div className={`status-item ${diagResult.gateway === "pass" ? "ok" : diagResult.gateway === "fail" ? "error" : ""}`}>
+                  <span className="icon">{diagResult.gateway === "pass" ? "✅" : diagResult.gateway === "fail" ? "❌" : "➖"}</span>
+                  <span className="label">Gateway</span>
+                  <span className="value">{diagResult.gateway}</span>
+                </div>
+                <div className={`status-item ${diagResult.channel === "pass" ? "ok" : diagResult.channel === "fail" ? "error" : ""}`}>
+                  <span className="icon">{diagResult.channel === "pass" ? "✅" : diagResult.channel === "fail" ? "❌" : "➖"}</span>
+                  <span className="label">Channel</span>
+                  <span className="value">{diagResult.channel}</span>
+                </div>
+                <div className={`status-item ${diagResult.agent === "pass" ? "ok" : diagResult.agent === "fail" ? "error" : ""}`}>
+                  <span className="icon">{diagResult.agent === "pass" ? "✅" : diagResult.agent === "fail" ? "❌" : "➖"}</span>
+                  <span className="label">Agent</span>
+                  <span className="value">{diagResult.agent}</span>
+                </div>
               </div>
             </section>
 

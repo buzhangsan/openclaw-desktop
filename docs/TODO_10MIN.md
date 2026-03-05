@@ -14,7 +14,7 @@ Execution rule:
 - [x] T5 (10m): Wire Provider config UI -> `save_provider_config` + `load_config`.
 - [x] T6 (10m): Wire Agent config UI -> `save_agent_config` + `load_config`.
 - [x] T7 (10m): Wire Channel config UI -> `save_channel_config` + `validate_channel`.
-- [ ] T8 (10m): Add Validation Center skeleton (Gateway/Channel/Agent test cards).
+- [x] T8 (10m): Add Validation Center skeleton (Gateway/Channel/Agent test cards).
 - [ ] T9 (10m): Add diagnostics export command + UI action.
 - [ ] T10 (10m): End-to-end wizard pass and polishing.
 
@@ -25,3 +25,4 @@ Execution rule:
 - 2026-03-05 14:46 +08:00: Completed T3 — local checks passed (`cargo check`, `npm run build`).
 - 2026-03-05 14:59 +08:00: Completed T4 — CI run 22705868481 passed on ubuntu/windows/macos.
 - 2026-03-05 15:09 +08:00: Completed T5/T6/T7 — wired Provider/Agent/Channel wizard steps to load/save/validate backend commands.
+- 2026-03-05 16:32 +08:00: Completed T8 — added Validation Center skeleton with Gateway/Channel/Agent diagnostic cards.
