@@ -72,6 +72,18 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
+      - name: Debug produced bundles
+        if: always()
+        shell: bash
+        run: |
+          echo "Platform: ${{ matrix.platform }}"
+          echo "Listing src-tauri/target/release/bundle"
+          ls -la src-tauri/target/release/bundle || true
+          echo "Find bundle files"
+          find src-tauri/target/release -maxdepth 5 -type f \
+            \( -name "*.dmg" -o -name "*.app" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.msi" -o -name "*.exe" \) \
+            -print || true
+
   # Quick check job for PRs
   check:
     runs-on: ubuntu-22.04
