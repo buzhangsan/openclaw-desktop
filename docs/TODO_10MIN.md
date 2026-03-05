@@ -26,7 +26,10 @@ Execution rule:
 - [x] T17 (10m): Commit/push release execution pack + TODO update; verify CI run re-triggered.
 - [x] T18 (10m): Capture artifact evidence from latest CI run (filenames/checksums) into release checklist.
 - [x] T19 (10m): Commit/push artifact evidence updates and confirm CI run status for release readiness.
-- [ ] T20 (10m): Track run `22716088507` to completion and update release readiness decision (GO/NO-GO).
+- [x] T20 (10m): Track run `22716088507` to completion and update release readiness decision (GO/NO-GO).
+- [ ] T21 (10m): Execute cross-platform smoke test checklist (installer launch + first-run wizard + diagnostics export readability) and capture evidence links. **(Blocked: missing Windows/macOS interactive test environments in current host session)**
+- [x] T22 (10m): Prepare manual smoke-test handoff package (steps + evidence template + tester assignment) and switch readiness gate to waiting-for-evidence.
+- [ ] T23 (10m): Commit/push T22 handoff package updates and trigger CI for traceability.
 
 ## Progress Log
 - 2026-03-05 14:43 +08:00: Initialized 10-minute execution hook.
@@ -47,3 +50,6 @@ Execution rule:
 - 2026-03-05 19:15 +08:00: Completed T17 — committed/pushed release execution pack + TODO update (`3e8d2f4`), and confirmed CI re-triggered for the new push.
 - 2026-03-05 19:27 +08:00: Completed T18 — captured latest CI artifact evidence (run `22715394057` / draft release `main`) with filenames + SHA256 into release checklist.
 - 2026-03-05 19:38 +08:00: Completed T19 — committed/pushed artifact evidence updates (`ac861b0`), and confirmed new CI run `22716088507` is queued for release-readiness verification.
+- 2026-03-05 19:46 +08:00: Completed T20 — tracked run `22716088507` to completion (success on ubuntu/windows/macos) and set release readiness decision to **NO-GO** until smoke tests + installer startup verification are finished.
+- 2026-03-05 19:55 +08:00: T21 attempted — cross-platform smoke checklist requires interactive Windows/macOS installer launch + first-run checks; blocked in current Linux-only host session. Captured CI evidence links and queued T22 handoff package for manual smoke execution.
+- 2026-03-05 20:07 +08:00: Completed T22 — added `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md` (manual smoke steps + evidence template + tester assignment), and updated release decision to **NO-GO (waiting-for-evidence)**.

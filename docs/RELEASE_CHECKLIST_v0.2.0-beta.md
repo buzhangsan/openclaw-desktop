@@ -33,3 +33,16 @@ Latest evidence snapshot (CI run `22715394057`, workflow: `Build OpenClaw Deskto
 - [ ] Publish beta to target testers channel.
 - [ ] Add feedback template (environment, repro steps, logs/diagnostics file).
 - [ ] Define go/no-go criteria for v0.2.0 stable.
+
+## 6) Current Release Readiness Decision
+- Decision time: 2026-03-05 19:55 +08:00
+- Latest CI verification run: `22716099630` ✅ (ubuntu/windows/macos all green)
+- **Decision: NO-GO (waiting-for-evidence)**
+- Reason: quality gate and CI are green, but manual cross-platform smoke evidence is still missing; handoff package prepared at `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md`.
+
+### Smoke Test Execution Status (T21)
+- Current environment: Linux host session only (no interactive Windows/macOS desktop runtime available).
+- Result: cross-platform installer launch + first-run wizard verification **blocked** pending manual test execution on Windows/macOS devices.
+- Evidence links:
+  - CI run `22716099630`: https://github.com/buzhangsan/openclaw-desktop/actions/runs/22716099630
+  - CI run `22716088507`: https://github.com/buzhangsan/openclaw-desktop/actions/runs/22716088507
