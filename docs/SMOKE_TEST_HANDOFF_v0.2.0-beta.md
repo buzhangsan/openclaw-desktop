@@ -50,10 +50,11 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-05 20:26 +08:00）
-- Windows (Zhangsan-PC): 待通过可交互消息面发送跟进并收集回传证据。
-- macOS tester: 待指定。
-- 阻塞：当前自动化节点不支持 `system.notify`，无法在本会话直接推送桌面通知。
+### 当前跟进状态（2026-03-05 21:25 +08:00）
+- Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
+- macOS tester: 仍待指定（当前主要阻塞）。
+- CI 基线：run `22718617649`（green，最新，暂无更新 run）。
+- 阻塞：当前会话无法直接触达指定测试人并收集截图/日志回传，需人工在 Discord 交互面完成。
 
 ## 7) 通过标准（Release Gate）
 - Windows + macOS 至少各 1 份 PASS 证据
