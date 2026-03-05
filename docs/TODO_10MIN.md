@@ -18,7 +18,8 @@ Execution rule:
 - [x] T9 (10m): Add diagnostics export command + UI action.
 - [x] T10 (10m): End-to-end wizard pass and polishing.
 - [x] T11 (10m): Commit/push T10 polish changes and trigger CI.
-- [ ] T12 (10m): Review CI run + start v0.2.0-beta release checklist draft.
+- [x] T12 (10m): Review CI run + start v0.2.0-beta release checklist draft.
+- [x] T13 (10m): Commit/push release checklist + TODO log updates; verify CI re-triggered.
 
 ## Progress Log
 - 2026-03-05 14:43 +08:00: Initialized 10-minute execution hook.
@@ -31,3 +32,5 @@ Execution rule:
 - 2026-03-05 17:58 +08:00: Completed T9 — added `export_diagnostics` backend command + Validation Center “导出诊断文件” action; local `npm run build` and `cargo check` passed.
 - 2026-03-05 18:08 +08:00: Completed T10 — did end-to-end wizard polish (resume step from existing config + completion checklist), local `npm run build` and `cargo check` passed.
 - 2026-03-05 18:16 +08:00: Completed T11 — refreshed local verification (`npm run build`, `cargo check`), committed/pushed wizard polish updates to trigger CI.
+- 2026-03-05 18:26 +08:00: Completed T12 — reviewed CI run 22713211677 (success on Build OpenClaw Desktop), and drafted `docs/RELEASE_CHECKLIST_v0.2.0-beta.md`.
+- 2026-03-05 18:37 +08:00: Completed T13 — committed/pushed release checklist + TODO log updates; CI run re-triggered for verification.
