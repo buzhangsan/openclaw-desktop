@@ -5,8 +5,8 @@
 - [ ] Confirm out-of-scope items are deferred (auto-install OpenClaw, full onboarding copy, update checker).
 
 ## 2) Quality Gate
-- [ ] Local checks pass: `npm run build`, `cargo check`.
-- [ ] CI checks pass on Windows/macOS/Linux (`Build OpenClaw Desktop`).
+- [x] Local checks pass: `npm run build`, `cargo check`.
+- [x] CI checks pass on Windows/macOS/Linux (`Build OpenClaw Desktop`).
 - [ ] Smoke test first-run flow on Windows/macOS/Linux VM or physical device.
 - [ ] Verify diagnostics export file exists and is readable.
 
