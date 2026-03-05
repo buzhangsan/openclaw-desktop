@@ -36,7 +36,7 @@ Latest evidence snapshot (CI run `22715394057`, workflow: `Build OpenClaw Deskto
 
 ## 6) Current Release Readiness Decision
 - Decision time: 2026-03-05 19:55 +08:00
-- Latest CI verification run: `22716099630` ✅ (ubuntu/windows/macos all green)
+- Latest CI verification run: `22717906551` ✅ (ubuntu/windows/macos all green)
 - **Decision: NO-GO (waiting-for-evidence)**
 - Reason: quality gate and CI are green, but manual cross-platform smoke evidence is still missing; handoff package prepared at `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md`.
 
