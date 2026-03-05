@@ -1,4 +1,5 @@
 mod commands;
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -14,6 +15,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::check_system_status,
+            commands::setup_embedded_node,
             commands::install_openclaw,
             commands::start_gateway,
             commands::stop_gateway,

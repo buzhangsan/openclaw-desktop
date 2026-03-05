@@ -193,6 +193,119 @@ section h2 {
   font-size: 12px;
 }
 
+/* Wizard styles */
+.wizard .main {
+  max-width: 600px;
+}
+
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.5;
+}
+
+.progress-step.active {
+  opacity: 1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.progress-step.active .step-number {
+  background: var(--primary);
+}
+
+.step-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.wizard-step {
+  text-align: center;
+}
+
+.wizard-step h2 {
+  margin-bottom: 24px;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Success step */
+.wizard-step.success {
+  padding: 40px 0;
+}
+
+.success-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.wizard-step.success h2 {
+  color: var(--success);
+}
+
+.wizard-step.success .hint {
+  color: var(--text-muted);
+  margin: 16px 0 32px;
+}
+
+/* Button sizes */
+.btn-large {
+  padding: 16px 48px;
+  font-size: 16px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .status-grid {
@@ -205,5 +318,13 @@ section h2 {
   
   .btn {
     width: 100%;
+  }
+  
+  .progress {
+    gap: 16px;
+  }
+  
+  .step-label {
+    display: none;
   }
 }
