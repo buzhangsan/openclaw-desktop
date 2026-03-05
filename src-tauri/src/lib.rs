@@ -26,6 +26,7 @@ pub fn run() {
             commands::save_agent_config,
             commands::save_channel_config,
             commands::validate_channel,
+            commands::export_diagnostics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

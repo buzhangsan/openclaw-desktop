@@ -73,6 +73,10 @@ function App() {
     agent: "unknown" | "pass" | "fail";
   }>({ gateway: "unknown", channel: "unknown", agent: "unknown" });
 
+  const providerConfigured = !!apiKey.trim();
+  const agentConfigured = !!agentName.trim();
+  const channelConfigured = !!channelToken.trim();
+
   // 检查系统状态
   const checkStatus = async () => {
     try {
@@ -171,6 +175,11 @@ function App() {
   const loadConfig = async () => {
     try {
       const cfg = await invoke<DesktopConfig>("load_config");
+
+      const hasProvider = !!cfg.provider?.api_key?.trim();
+      const hasAgent = !!cfg.agent?.name?.trim();
+      const hasChannel = !!cfg.channels?.[0]?.token?.trim();
+
       if (cfg.provider) {
         setProviderName(cfg.provider.provider);
         setApiEndpoint(cfg.provider.endpoint);
@@ -187,6 +196,17 @@ function App() {
         setChannelType(c.channel_type);
         setChannelToken(c.token || "");
         setChannelTarget(c.target || "");
+      }
+
+      // 根据已存在配置自动定位向导步骤，支持中断后续跑
+      if (hasProvider && hasAgent && hasChannel) {
+        setSetupStep(5);
+      } else if (hasProvider && hasAgent) {
+        setSetupStep(4);
+      } else if (hasProvider) {
+        setSetupStep(3);
+      } else {
+        setSetupStep(2);
       }
     } catch {
       // ignore if first run
@@ -290,6 +310,18 @@ function App() {
           channelPass ? "pass" : "fail"
         }, agent=${agentPass ? "pass" : "fail"}`
       );
+    } finally {
+      setDiagRunning(false);
+    }
+  };
+
+  const exportDiagnostics = async () => {
+    setDiagRunning(true);
+    try {
+      const filePath = await invoke<string>("export_diagnostics");
+      addLog(`✅ 已导出诊断文件: ${filePath}`);
+    } catch (e) {
+      addLog(`❌ 导出诊断失败: ${e}`);
     } finally {
       setDiagRunning(false);
     }
@@ -538,6 +570,11 @@ function App() {
               <h2>设置完成！</h2>
               <p>OpenClaw Desktop 已准备就绪</p>
               <p className="hint">已完成 Provider / Agent / Channel 基础配置</p>
+              <ul style={{ textAlign: "left", margin: "10px auto", maxWidth: 360 }}>
+                <li>{providerConfigured ? "✅" : "❌"} Provider 配置</li>
+                <li>{agentConfigured ? "✅" : "❌"} Agent 配置</li>
+                <li>{channelConfigured ? "✅" : "❌"} Channel 配置</li>
+              </ul>
 
               <button className="btn btn-primary btn-large" onClick={finishWizard}>
                 开始使用 →
@@ -634,6 +671,9 @@ function App() {
               <div className="button-group" style={{ marginBottom: 12 }}>
                 <button className="btn btn-secondary" onClick={runDiagnostics} disabled={diagRunning}>
                   {diagRunning ? "诊断中..." : "运行完整诊断"}
+                </button>
+                <button className="btn btn-primary" onClick={exportDiagnostics} disabled={diagRunning}>
+                  {diagRunning ? "处理中..." : "导出诊断文件"}
                 </button>
               </div>
 

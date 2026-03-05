@@ -576,3 +576,48 @@ pub async fn validate_channel(config: ChannelConfig) -> Result<String, String> {
         }
     }
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DiagnosticsSnapshot {
+    pub exported_at_unix: u64,
+    pub system: SystemStatus,
+    pub config: DesktopConfig,
+    pub platform: String,
+}
+
+#[tauri::command]
+pub async fn export_diagnostics() -> Result<String, String> {
+    let gateway_port = get_gateway_port();
+    let snapshot = DiagnosticsSnapshot {
+        exported_at_unix: std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|e| format!("获取时间失败: {}", e))?
+            .as_secs(),
+        system: SystemStatus {
+            node_installed: check_node().0,
+            node_version: check_node().1,
+            npm_installed: check_npm().0,
+            npm_version: check_npm().1,
+            openclaw_installed: check_openclaw().0,
+            openclaw_version: check_openclaw().1,
+            gateway_running: check_gateway_running(gateway_port),
+            gateway_port,
+            embedded_node_ready: is_embedded_node_ready(),
+        },
+        config: load_desktop_config_file()?,
+        platform: std::env::consts::OS.to_string(),
+    };
+
+    let diagnostics_dir = get_app_data_dir().join("diagnostics");
+    fs::create_dir_all(&diagnostics_dir)
+        .map_err(|e| format!("创建诊断目录失败: {}", e))?;
+
+    let file_path = diagnostics_dir.join(format!("diagnostics-{}.json", snapshot.exported_at_unix));
+    let content = serde_json::to_string_pretty(&snapshot)
+        .map_err(|e| format!("序列化诊断数据失败: {}", e))?;
+
+    fs::write(&file_path, content)
+        .map_err(|e| format!("写入诊断文件失败: {}", e))?;
+
+    Ok(file_path.to_string_lossy().to_string())
+}
