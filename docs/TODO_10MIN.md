@@ -31,7 +31,8 @@ Execution rule:
 - [x] T22 (10m): Prepare manual smoke-test handoff package (steps + evidence template + tester assignment) and switch readiness gate to waiting-for-evidence.
 - [x] T23 (10m): Commit/push T22 handoff package updates and trigger CI for traceability.
 - [x] T24 (10m): Monitor CI run triggered by `a957f70` and keep release gate in waiting-for-evidence until manual smoke results arrive.
-- [ ] T25 (10m): Follow up manual smoke-test evidence collection (ping assigned testers + attach returned screenshots/log links into handoff/checklist docs).
+- [x] T25 (10m): Prepare tester follow-up outreach package (ready-to-send ping template + evidence placeholders) and record current outreach blocker.
+- [ ] T26 (10m): Send follow-up to Windows/macOS testers from an interactive messaging surface and append returned screenshots/log links into handoff/checklist docs.
 
 ## Progress Log
 - 2026-03-05 14:43 +08:00: Initialized 10-minute execution hook.
@@ -57,3 +58,4 @@ Execution rule:
 - 2026-03-05 20:07 +08:00: Completed T22 — added `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md` (manual smoke steps + evidence template + tester assignment), and updated release decision to **NO-GO (waiting-for-evidence)**.
 - 2026-03-05 20:09 +08:00: Completed T23 — committed/pushed handoff package updates (`a957f70`), CI retriggered for traceability.
 - 2026-03-05 20:16 +08:00: Completed T24 — monitored CI run `22717177216` (commit `a957f70`) to completion: **success** on Build OpenClaw Desktop; release gate remains **NO-GO (waiting-for-evidence)** until manual smoke-test artifacts are submitted.
+- 2026-03-05 20:26 +08:00: Completed T25 — added ready-to-send tester follow-up template and outreach status block in `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md`; outreach remains blocked in-session because node capabilities do not support `system.notify`.

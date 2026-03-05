@@ -40,7 +40,22 @@
 - 问题描述（如失败）：
 ```
 
-## 6) 通过标准（Release Gate）
+## 6) 跟进模板（可直接发送给测试人）
+```text
+请按 OpenClaw Desktop v0.2.0-beta 冒烟清单回传证据：
+1) 安装并启动结果（PASS/FAIL）
+2) 首次向导完成结果（PASS/FAIL）
+3) 诊断导出可读性（PASS/FAIL）
+4) 安装包文件名 + 截图/日志链接
+文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
+```
+
+### 当前跟进状态（2026-03-05 20:26 +08:00）
+- Windows (Zhangsan-PC): 待通过可交互消息面发送跟进并收集回传证据。
+- macOS tester: 待指定。
+- 阻塞：当前自动化节点不支持 `system.notify`，无法在本会话直接推送桌面通知。
+
+## 7) 通过标准（Release Gate）
 - Windows + macOS 至少各 1 份 PASS 证据
 - 诊断导出在两个平台都“可读且字段完整”
 - 无 P0/P1 启动阻塞问题
