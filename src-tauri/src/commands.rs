@@ -13,6 +13,8 @@ pub struct GatewayProcess(pub Mutex<Option<Child>>);
 pub struct SystemStatus {
     pub node_installed: bool,
     pub node_version: Option<String>,
+    pub npm_installed: bool,
+    pub npm_version: Option<String>,
     pub openclaw_installed: bool,
     pub openclaw_version: Option<String>,
     pub gateway_running: bool,
@@ -64,22 +66,61 @@ fn get_node_executable() -> String {
     }
 }
 
-/// Get the npm executable path (system or embedded)
-fn get_npm_executable() -> String {
-    // First check if embedded node is available
+/// Resolve npm command (binary + prefix args)
+/// Returns (command, prefix_args). Final caller should append actual npm args.
+fn resolve_npm_command() -> Option<(String, Vec<String>)> {
+    // First check embedded npm
     if is_embedded_node_ready() {
         let embedded_path = get_embedded_node_path();
         #[cfg(target_os = "windows")]
         {
-            embedded_path.join("npm.cmd").to_string_lossy().to_string()
+            let npm_cmd = embedded_path.join("npm.cmd");
+            if npm_cmd.exists() {
+                return Some((npm_cmd.to_string_lossy().to_string(), vec![]));
+            }
         }
         #[cfg(not(target_os = "windows"))]
         {
-            embedded_path.join("bin").join("npm").to_string_lossy().to_string()
+            let npm_bin = embedded_path.join("bin").join("npm");
+            if npm_bin.exists() {
+                return Some((npm_bin.to_string_lossy().to_string(), vec![]));
+            }
         }
-    } else {
-        // Use system npm
-        "npm".to_string()
+    }
+
+    // Fallback: system npm
+    #[cfg(target_os = "windows")]
+    {
+        // Try npm.cmd first
+        let candidates: Vec<(String, Vec<String>)> = vec![
+            ("npm.cmd".to_string(), vec![]),
+            ("npm".to_string(), vec![]),
+            (
+                "cmd".to_string(),
+                vec!["/C".to_string(), "npm".to_string()],
+            ),
+        ];
+
+        for (cmd, prefix_args) in candidates {
+            let mut args = prefix_args.clone();
+            args.push("--version".to_string());
+            if let Ok(output) = Command::new(&cmd).args(&args).output() {
+                if output.status.success() {
+                    return Some((cmd, prefix_args));
+                }
+            }
+        }
+        None
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        if let Ok(output) = Command::new("npm").arg("--version").output() {
+            if output.status.success() {
+                return Some(("npm".to_string(), vec![]));
+            }
+        }
+        None
     }
 }
 
@@ -96,6 +137,27 @@ fn check_node() -> (bool, Option<String>) {
             }
         }
         Err(_) => (false, None),
+    }
+}
+
+/// Check if npm is installed and get version
+fn check_npm() -> (bool, Option<String>) {
+    if let Some((cmd, prefix_args)) = resolve_npm_command() {
+        let mut args = prefix_args;
+        args.push("--version".to_string());
+        match Command::new(&cmd).args(&args).output() {
+            Ok(output) => {
+                if output.status.success() {
+                    let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                    (true, Some(version))
+                } else {
+                    (false, None)
+                }
+            }
+            Err(_) => (false, None),
+        }
+    } else {
+        (false, None)
     }
 }
 
@@ -150,6 +212,7 @@ fn get_gateway_port() -> u16 {
 #[tauri::command]
 pub async fn check_system_status() -> Result<SystemStatus, String> {
     let (node_installed, node_version) = check_node();
+    let (npm_installed, npm_version) = check_npm();
     let (openclaw_installed, openclaw_version) = check_openclaw();
     let gateway_port = get_gateway_port();
     let gateway_running = check_gateway_running(gateway_port);
@@ -158,6 +221,8 @@ pub async fn check_system_status() -> Result<SystemStatus, String> {
     Ok(SystemStatus {
         node_installed,
         node_version,
+        npm_installed,
+        npm_version,
         openclaw_installed,
         openclaw_version,
         gateway_running,
@@ -188,17 +253,19 @@ pub async fn setup_embedded_node() -> Result<String, String> {
 /// Install OpenClaw via npm
 #[tauri::command]
 pub async fn install_openclaw() -> Result<String, String> {
-    let npm_exe = get_npm_executable();
-    
-    // Check if npm is available
-    let npm_check = Command::new(&npm_exe).arg("--version").output();
-    if npm_check.is_err() {
-        return Err("npm 未安装。请先安装 Node.js 或使用内嵌版本。".to_string());
-    }
+    let (npm_cmd, mut prefix_args) = resolve_npm_command()
+        .ok_or_else(|| "npm 未安装或不可用。请先安装 Node.js（含 npm）或启用内嵌 Node.js。".to_string())?;
+
+    // Build final args: [prefix..., install -g openclaw@latest]
+    prefix_args.extend([
+        "install".to_string(),
+        "-g".to_string(),
+        "openclaw@latest".to_string(),
+    ]);
 
     // Run npm install -g openclaw
-    let output = Command::new(&npm_exe)
-        .args(["install", "-g", "openclaw@latest"])
+    let output = Command::new(&npm_cmd)
+        .args(&prefix_args)
         .output()
         .map_err(|e| format!("执行 npm install 失败: {}", e))?;
 
@@ -206,7 +273,8 @@ pub async fn install_openclaw() -> Result<String, String> {
         Ok("OpenClaw 安装成功！".to_string())
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        Err(format!("安装失败: {}", stderr))
+        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+        Err(format!("安装失败:\n{}\n{}", stderr, stdout))
     }
 }
 

@@ -5,6 +5,8 @@ import { invoke } from "@tauri-apps/api/core";
 interface SystemStatus {
   node_installed: boolean;
   node_version: string | null;
+  npm_installed: boolean;
+  npm_version: string | null;
   openclaw_installed: boolean;
   openclaw_version: string | null;
   gateway_running: boolean;
@@ -28,14 +30,13 @@ function App() {
   
   // Setup step
   const [setupStep, setSetupStep] = useState(1);
-  const totalSteps = 3;
 
   // 检查系统状态
   const checkStatus = async () => {
     try {
       const result = await invoke<SystemStatus>("check_system_status");
       setStatus(result);
-      addLog(`状态: Node=${result.node_version || "无"}, OpenClaw=${result.openclaw_version || "无"}, 内嵌Node=${result.embedded_node_ready ? "就绪" : "未就绪"}`);
+      addLog(`状态: Node=${result.node_version || "无"}, npm=${result.npm_version || "无"}, OpenClaw=${result.openclaw_version || "无"}, 内嵌Node=${result.embedded_node_ready ? "就绪" : "未就绪"}`);
       
       // 如果一切就绪，直接进入主界面
       if (result.node_installed && result.openclaw_installed) {
@@ -164,6 +165,11 @@ function App() {
                   <span className="label">Node.js</span>
                   <span className="value">{status?.node_version || (status?.embedded_node_ready ? "内嵌版就绪" : "未安装")}</span>
                 </div>
+                <div className={`status-item ${status?.npm_installed ? "ok" : "error"}`}>
+                  <span className="icon">{status?.npm_installed ? "✅" : "❌"}</span>
+                  <span className="label">npm</span>
+                  <span className="value">{status?.npm_version || "未安装"}</span>
+                </div>
                 <div className={`status-item ${status?.openclaw_installed ? "ok" : "error"}`}>
                   <span className="icon">{status?.openclaw_installed ? "✅" : "❌"}</span>
                   <span className="label">OpenClaw</span>
@@ -177,7 +183,7 @@ function App() {
                     {installing ? "设置中..." : "设置内嵌 Node.js"}
                   </button>
                 )}
-                {!status?.openclaw_installed && (status?.node_installed || status?.embedded_node_ready) && (
+                {!status?.openclaw_installed && (status?.npm_installed || status?.embedded_node_ready) && (
                   <button className="btn btn-primary" onClick={installOpenClaw} disabled={installing}>
                     {installing ? "安装中..." : "安装 OpenClaw"}
                   </button>
@@ -276,6 +282,11 @@ function App() {
                   <span className="label">Node.js</span>
                   <span className="value">{status?.node_version || (status?.embedded_node_ready ? "内嵌版" : "未安装")}</span>
                 </div>
+                <div className={`status-item ${status?.npm_installed ? "ok" : "error"}`}>
+                  <span className="icon">{status?.npm_installed ? "✅" : "❌"}</span>
+                  <span className="label">npm</span>
+                  <span className="value">{status?.npm_version || "未安装"}</span>
+                </div>
                 <div className={`status-item ${status?.openclaw_installed ? "ok" : "error"}`}>
                   <span className="icon">{status?.openclaw_installed ? "✅" : "❌"}</span>
                   <span className="label">OpenClaw</span>
@@ -296,7 +307,12 @@ function App() {
               <h2>操作</h2>
               <div className="button-group">
                 {!status?.openclaw_installed && (
-                  <button className="btn btn-primary" onClick={installOpenClaw} disabled={installing}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={installOpenClaw}
+                    disabled={installing || (!status?.npm_installed && !status?.embedded_node_ready)}
+                    title={!status?.npm_installed && !status?.embedded_node_ready ? "需要 npm 或内嵌 Node.js" : ""}
+                  >
                     {installing ? "安装中..." : "安装 OpenClaw"}
                   </button>
                 )}
