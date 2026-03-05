@@ -1,0 +1,35 @@
+flowchart TD
+  A[Launch App] --> B[Welcome]
+  B --> C[Environment Check]
+
+  C --> C1{Node.js OK?}
+  C1 -- No --> F1[Auto Fix Node/PATH]
+  F1 --> C
+  C1 -- Yes --> C2{npm OK?}
+
+  C2 -- No --> F2[Repair PATH / Embedded Node]
+  F2 --> C
+  C2 -- Yes --> C3{OpenClaw Installed?}
+
+  C3 -- No --> D[Install OpenClaw]
+  D --> D1{Install Success?}
+  D1 -- No --> E1[Classify Error + Fix + Retry]
+  E1 --> D
+  D1 -- Yes --> E[Setup Wizard]
+  C3 -- Yes --> E
+
+  E --> E2[Provider Config]
+  E2 --> E3[Agent Config]
+  E3 --> E4[Channel Config]
+
+  E4 --> V[Validation Center]
+  V --> V1{Gateway Healthy?}
+  V1 -- No --> VF1[Gateway Repair]
+  VF1 --> V
+  V1 -- Yes --> V2{Channel Test Pass?}
+  V2 -- No --> VF2[Channel Reconfigure]
+  VF2 --> E4
+  V2 -- Yes --> V3{Agent Test Pass?}
+  V3 -- No --> VF3[Agent Fix]
+  VF3 --> E3
+  V3 -- Yes --> Z[Done: Open Dashboard]
