@@ -443,3 +443,136 @@ pub async fn get_gateway_status() -> Result<bool, String> {
     let port = get_gateway_port();
     Ok(check_gateway_running(port))
 }
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+pub struct ProviderConfig {
+    pub provider: String,
+    pub endpoint: String,
+    pub model: String,
+    pub api_key: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+pub struct AgentConfig {
+    pub name: String,
+    pub profile: String,
+    pub tool_policy: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+pub struct ChannelConfig {
+    pub channel_type: String,
+    pub enabled: bool,
+    pub token: String,
+    pub target: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+pub struct DesktopConfig {
+    pub provider: Option<ProviderConfig>,
+    pub agent: Option<AgentConfig>,
+    pub channels: Vec<ChannelConfig>,
+}
+
+fn get_desktop_config_path() -> PathBuf {
+    get_app_data_dir().join("desktop-config.json")
+}
+
+fn load_desktop_config_file() -> Result<DesktopConfig, String> {
+    let path = get_desktop_config_path();
+    if !path.exists() {
+        return Ok(DesktopConfig::default());
+    }
+
+    let content = fs::read_to_string(&path)
+        .map_err(|e| format!("读取配置失败: {}", e))?;
+    serde_json::from_str::<DesktopConfig>(&content)
+        .map_err(|e| format!("解析配置失败: {}", e))
+}
+
+fn save_desktop_config_file(cfg: &DesktopConfig) -> Result<(), String> {
+    let app_dir = get_app_data_dir();
+    fs::create_dir_all(&app_dir)
+        .map_err(|e| format!("创建配置目录失败: {}", e))?;
+
+    let path = get_desktop_config_path();
+    let content = serde_json::to_string_pretty(cfg)
+        .map_err(|e| format!("序列化配置失败: {}", e))?;
+    fs::write(path, content)
+        .map_err(|e| format!("写入配置失败: {}", e))
+}
+
+#[tauri::command]
+pub async fn load_config() -> Result<DesktopConfig, String> {
+    load_desktop_config_file()
+}
+
+#[tauri::command]
+pub async fn save_provider_config(config: ProviderConfig) -> Result<String, String> {
+    if config.provider.trim().is_empty() {
+        return Err("provider 不能为空".to_string());
+    }
+    if config.model.trim().is_empty() {
+        return Err("model 不能为空".to_string());
+    }
+    if config.api_key.trim().is_empty() {
+        return Err("api_key 不能为空".to_string());
+    }
+
+    let mut cfg = load_desktop_config_file()?;
+    cfg.provider = Some(config);
+    save_desktop_config_file(&cfg)?;
+    Ok("Provider 配置已保存".to_string())
+}
+
+#[tauri::command]
+pub async fn save_agent_config(config: AgentConfig) -> Result<String, String> {
+    if config.name.trim().is_empty() {
+        return Err("agent name 不能为空".to_string());
+    }
+    let mut cfg = load_desktop_config_file()?;
+    cfg.agent = Some(config);
+    save_desktop_config_file(&cfg)?;
+    Ok("Agent 配置已保存".to_string())
+}
+
+#[tauri::command]
+pub async fn save_channel_config(config: ChannelConfig) -> Result<String, String> {
+    if config.channel_type.trim().is_empty() {
+        return Err("channel_type 不能为空".to_string());
+    }
+
+    let mut cfg = load_desktop_config_file()?;
+    if let Some(existing) = cfg
+        .channels
+        .iter_mut()
+        .find(|c| c.channel_type.eq_ignore_ascii_case(&config.channel_type))
+    {
+        *existing = config;
+    } else {
+        cfg.channels.push(config);
+    }
+
+    save_desktop_config_file(&cfg)?;
+    Ok("Channel 配置已保存".to_string())
+}
+
+#[tauri::command]
+pub async fn validate_channel(config: ChannelConfig) -> Result<String, String> {
+    let t = config.channel_type.to_lowercase();
+    match t.as_str() {
+        "discord" | "telegram" => {
+            if config.token.trim().is_empty() {
+                return Err("Token 不能为空".to_string());
+            }
+            Ok("Channel 基础校验通过".to_string())
+        }
+        _ => {
+            if config.enabled {
+                Ok("未知 channel 类型，已跳过在线校验".to_string())
+            } else {
+                Ok("Channel 未启用，跳过校验".to_string())
+            }
+        }
+    }
+}

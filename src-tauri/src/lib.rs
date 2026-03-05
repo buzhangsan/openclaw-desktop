@@ -21,6 +21,11 @@ pub fn run() {
             commands::start_gateway,
             commands::stop_gateway,
             commands::get_gateway_status,
+            commands::load_config,
+            commands::save_provider_config,
+            commands::save_agent_config,
+            commands::save_channel_config,
+            commands::validate_channel,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
