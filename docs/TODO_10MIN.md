@@ -30,7 +30,8 @@ Execution rule:
 - [ ] T21 (10m): Execute cross-platform smoke test checklist (installer launch + first-run wizard + diagnostics export readability) and capture evidence links. **(Blocked: missing Windows/macOS interactive test environments in current host session)**
 - [x] T22 (10m): Prepare manual smoke-test handoff package (steps + evidence template + tester assignment) and switch readiness gate to waiting-for-evidence.
 - [x] T23 (10m): Commit/push T22 handoff package updates and trigger CI for traceability.
-- [ ] T24 (10m): Monitor CI run triggered by `a957f70` and keep release gate in waiting-for-evidence until manual smoke results arrive.
+- [x] T24 (10m): Monitor CI run triggered by `a957f70` and keep release gate in waiting-for-evidence until manual smoke results arrive.
+- [ ] T25 (10m): Follow up manual smoke-test evidence collection (ping assigned testers + attach returned screenshots/log links into handoff/checklist docs).
 
 ## Progress Log
 - 2026-03-05 14:43 +08:00: Initialized 10-minute execution hook.
@@ -55,3 +56,4 @@ Execution rule:
 - 2026-03-05 19:55 +08:00: T21 attempted — cross-platform smoke checklist requires interactive Windows/macOS installer launch + first-run checks; blocked in current Linux-only host session. Captured CI evidence links and queued T22 handoff package for manual smoke execution.
 - 2026-03-05 20:07 +08:00: Completed T22 — added `docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md` (manual smoke steps + evidence template + tester assignment), and updated release decision to **NO-GO (waiting-for-evidence)**.
 - 2026-03-05 20:09 +08:00: Completed T23 — committed/pushed handoff package updates (`a957f70`), CI retriggered for traceability.
+- 2026-03-05 20:16 +08:00: Completed T24 — monitored CI run `22717177216` (commit `a957f70`) to completion: **success** on Build OpenClaw Desktop; release gate remains **NO-GO (waiting-for-evidence)** until manual smoke-test artifacts are submitted.
