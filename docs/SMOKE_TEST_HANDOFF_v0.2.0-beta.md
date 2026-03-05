@@ -50,10 +50,10 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-05 23:45 +08:00）
+### 当前跟进状态（2026-03-05 23:55 +08:00）
 - Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
 - macOS tester: 仍待指定（当前主要阻塞）。
-- CI 基线：latest run `22725424023`（green）；上一 run `22725408251`（green）。
+- CI 基线：latest run `22725862976`（green）；上一 run `22725424023`（green）。
 - 阻塞：当前 cron/CLI 会话无法直接完成指定测试人的交互触达与证据回收，需在 Discord 交互面执行跟进并回填截图/日志链接。
 
 ## 7) 通过标准（Release Gate）
