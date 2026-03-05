@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use tauri::State;
 use std::path::PathBuf;
 use std::fs;
+#[cfg(target_os = "windows")]
+use std::env;
 
 // Global state to track gateway process
 pub struct GatewayProcess(pub Mutex<Option<Child>>);
@@ -47,6 +49,56 @@ fn is_embedded_node_ready() -> bool {
     }
 }
 
+#[cfg(target_os = "windows")]
+fn get_windows_node_path_candidates() -> Vec<String> {
+    let mut paths: Vec<String> = vec![
+        r"C:\Program Files\nodejs".to_string(),
+        r"C:\Program Files (x86)\nodejs".to_string(),
+    ];
+
+    if let Ok(local_app_data) = env::var("LOCALAPPDATA") {
+        paths.push(format!(r"{}\Programs\nodejs", local_app_data));
+    }
+    if let Ok(app_data) = env::var("APPDATA") {
+        paths.push(format!(r"{}\npm", app_data));
+    }
+
+    paths
+}
+
+#[cfg(target_os = "windows")]
+fn try_repair_windows_node_path() {
+    let current_path = env::var("PATH").unwrap_or_default();
+    let mut path_parts: Vec<String> = current_path
+        .split(';')
+        .filter(|p| !p.trim().is_empty())
+        .map(|p| p.to_string())
+        .collect();
+
+    let mut changed = false;
+    for candidate in get_windows_node_path_candidates() {
+        let node_exe = PathBuf::from(&candidate).join("node.exe");
+        let npm_cmd = PathBuf::from(&candidate).join("npm.cmd");
+
+        if (node_exe.exists() || npm_cmd.exists())
+            && !path_parts.iter().any(|p| p.eq_ignore_ascii_case(&candidate))
+        {
+            path_parts.push(candidate);
+            changed = true;
+        }
+    }
+
+    if changed {
+        let new_path = path_parts.join(";");
+        env::set_var("PATH", new_path);
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn try_repair_windows_node_path() {
+    // no-op on non-Windows
+}
+
 /// Get the Node.js executable path (system or embedded)
 fn get_node_executable() -> String {
     // First check if embedded node is available
@@ -69,6 +121,8 @@ fn get_node_executable() -> String {
 /// Resolve npm command (binary + prefix args)
 /// Returns (command, prefix_args). Final caller should append actual npm args.
 fn resolve_npm_command() -> Option<(String, Vec<String>)> {
+    try_repair_windows_node_path();
+
     // First check embedded npm
     if is_embedded_node_ready() {
         let embedded_path = get_embedded_node_path();
@@ -126,6 +180,7 @@ fn resolve_npm_command() -> Option<(String, Vec<String>)> {
 
 /// Check if Node.js is installed and get version
 fn check_node() -> (bool, Option<String>) {
+    try_repair_windows_node_path();
     let node_exe = get_node_executable();
     match Command::new(&node_exe).arg("--version").output() {
         Ok(output) => {
