@@ -24,7 +24,8 @@ Execution rule:
 - [x] T15 (10m): Refresh CI evidence snapshot and define next release-execution item.
 - [x] T16 (10m): Prepare v0.2.0-beta release execution pack (tag command, release notes skeleton, smoke checklist links).
 - [x] T17 (10m): Commit/push release execution pack + TODO update; verify CI run re-triggered.
-- [ ] T18 (10m): Capture artifact evidence from latest CI run (filenames/checksums) into release checklist.
+- [x] T18 (10m): Capture artifact evidence from latest CI run (filenames/checksums) into release checklist.
+- [ ] T19 (10m): Commit/push artifact evidence updates and confirm CI run status for release readiness.
 
 ## Progress Log
 - 2026-03-05 14:43 +08:00: Initialized 10-minute execution hook.
@@ -43,3 +44,4 @@ Execution rule:
 - 2026-03-05 18:55 +08:00: Completed T15 — refreshed CI snapshot (`gh run list`, latest run 22714348873 success) and set next item to release execution prep.
 - 2026-03-05 19:06 +08:00: Completed T16 — added `docs/RELEASE_EXECUTION_PACK_v0.2.0-beta.md` with tag/push commands, release notes skeleton, smoke checklist links, and `gh release create` command template.
 - 2026-03-05 19:15 +08:00: Completed T17 — committed/pushed release execution pack + TODO update (`3e8d2f4`), and confirmed CI re-triggered for the new push.
+- 2026-03-05 19:27 +08:00: Completed T18 — captured latest CI artifact evidence (run `22715394057` / draft release `main`) with filenames + SHA256 into release checklist.
