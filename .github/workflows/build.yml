@@ -109,6 +109,13 @@ jobs:
               ;;
           esac
 
+      - name: Run smoke test
+        if: always()
+        shell: bash
+        run: |
+          chmod +x scripts/smoke-test.sh
+          bash scripts/smoke-test.sh "${{ matrix.platform }}"
+
       - name: Debug produced bundles
         if: always()
         shell: bash
