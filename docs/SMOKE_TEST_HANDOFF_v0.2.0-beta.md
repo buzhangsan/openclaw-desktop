@@ -50,10 +50,11 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-06 10:33 +08:00）
+### 当前跟进状态（2026-03-06 15:08 +08:00）
 - Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
 - macOS tester: 仍待指定（当前主要阻塞）。
-- CI 基线：最新 run `22746220821`（success，docs blocker refresh）；最近失败样本 run `22728026668`（failed，macOS `bundle_dmg.sh` 打包失败）；最近发布验证成功基线 run `22726283117`（green）。
+- CI 基线：最新 run `22752777316`（success，`fix(ci): detect macOS app bundles in smoke test`）；上一条 run `22752455106` 为 failed（`feat(P3): integrate all P3 features in frontend`）；最近发布验证成功基线 run `22726283117`（green）；历史失败样本 run `22728026668`（failed，macOS `bundle_dmg.sh` 打包失败）。
+- 本地校验：当前 slice 未新增本地编译动作，沿用 14:23 已确认的 `npm run build`（pass）与 `cargo check --manifest-path src-tauri/Cargo.toml`（pass）结果。
 - 阻塞：当前 cron/CLI 会话无法直接完成指定测试人的交互触达与证据回收，需在 Discord 交互面执行跟进并回填截图/日志链接。
 
 ## 7) 通过标准（Release Gate）
