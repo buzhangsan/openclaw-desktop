@@ -27,6 +27,17 @@ check_file_exists() {
   fi
 }
 
+check_path_exists() {
+  local pattern="$1" label="$2"
+  local found
+  found=$(find src-tauri/target -name "$pattern" 2>/dev/null | head -1)
+  if [ -z "$found" ]; then
+    log_fail "$label not found (pattern: $pattern)"
+  else
+    log_pass "$label found: $found"
+  fi
+}
+
 echo "=== OpenClaw Desktop Smoke Test ==="
 echo "Platform: $PLATFORM"
 echo ""
@@ -42,7 +53,7 @@ fi
 case "$PLATFORM" in
   Darwin|macos*)
     check_file_exists "*.dmg" "macOS DMG" 5000000
-    check_file_exists "*.app" "macOS .app bundle" 1000
+    check_path_exists "*.app" "macOS .app bundle"
     ;;
   Linux|ubuntu*)
     check_file_exists "*.AppImage" "Linux AppImage" 5000000
