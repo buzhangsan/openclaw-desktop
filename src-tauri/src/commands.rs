@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use tauri::State;
 use std::path::PathBuf;
 use std::fs;
-use std::io::{BufRead, BufReader, Read, Write};
+use std::io::{BufRead, BufReader};
 use tauri::Emitter;
 #[cfg(target_os = "windows")]
 use std::env;
