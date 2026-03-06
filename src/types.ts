@@ -42,6 +42,31 @@ export type DiagStatus = "unknown" | "pass" | "fail";
 
 export interface DiagResult {
   gateway: DiagStatus;
+  gatewayDetail?: string;
   channel: DiagStatus;
+  channelDetail?: string;
   agent: DiagStatus;
+  agentDetail?: string;
+}
+
+export interface GatewayHealthInfo {
+  reachable: boolean;
+  status_code: number | null;
+  version: string | null;
+  uptime: string | null;
+  body_snippet: string | null;
+  error: string | null;
+}
+
+export interface ChannelValidationResult {
+  valid: boolean;
+  detail: string;
+  bot_username: string | null;
+}
+
+export interface AgentTestResult {
+  reachable: boolean;
+  responded: boolean;
+  detail: string;
+  response_snippet: string | null;
 }

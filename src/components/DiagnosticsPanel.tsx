@@ -7,6 +7,13 @@ interface DiagnosticsPanelProps {
   onExportDiagnostics: () => void;
 }
 
+const DIAG_KEYS = ["gateway", "channel", "agent"] as const;
+const DETAIL_KEYS: Record<string, keyof DiagResult> = {
+  gateway: "gatewayDetail",
+  channel: "channelDetail",
+  agent: "agentDetail",
+};
+
 export function DiagnosticsPanel({
   diagResult,
   diagRunning,
@@ -26,18 +33,25 @@ export function DiagnosticsPanel({
       </div>
 
       <div className="status-grid">
-        {(["gateway", "channel", "agent"] as const).map((key) => (
-          <div
-            key={key}
-            className={`status-item ${diagResult[key] === "pass" ? "ok" : diagResult[key] === "fail" ? "error" : ""}`}
-          >
-            <span className="icon">
-              {diagResult[key] === "pass" ? "✅" : diagResult[key] === "fail" ? "❌" : "➖"}
-            </span>
-            <span className="label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-            <span className="value">{diagResult[key]}</span>
-          </div>
-        ))}
+        {DIAG_KEYS.map((key) => {
+          const detail = (diagResult[DETAIL_KEYS[key]] as string) || "";
+          return (
+            <div
+              key={key}
+              className={`status-item ${diagResult[key] === "pass" ? "ok" : diagResult[key] === "fail" ? "error" : ""}`}
+            >
+              <span className="icon">
+                {diagResult[key] === "pass" ? "✅" : diagResult[key] === "fail" ? "❌" : "➖"}
+              </span>
+              <span className="label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+              <span className="value" title={detail}>
+                {diagResult[key] === "unknown"
+                  ? "未检测"
+                  : detail || diagResult[key]}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
