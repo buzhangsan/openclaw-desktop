@@ -4,6 +4,7 @@ Execution rule:
 - Work in 10-minute slices.
 - At end of each slice: mark status, run relevant checks, and send progress update.
 - Always pick the first unchecked item.
+- **No-op guard**: Before committing, run `./scripts/guard-no-op-commit.sh`. If only trivial/repeated status refreshes with no real progress, do NOT commit. Only commit when there is a substantive change (new task completed, real code/doc change, or blocker resolved).
 
 ## Queue
 
