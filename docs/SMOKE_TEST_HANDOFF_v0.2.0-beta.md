@@ -14,8 +14,9 @@
 - Linux 测试人：当前维护者（可复测）
 
 ## 3) 测试输入与证据链接
-- CI run（最近成功基线）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22726283117
-- CI run（最新失败样本，macOS DMG 打包）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22728026668
+- CI run（当前最新成功基线，含 macOS `.app` 检测修复）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22752777316
+- CI run（上一条成功发布验证基线）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22726283117
+- CI run（最近失败样本，已定位为 smoke 脚本误判而非产物缺失）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22752455106
 - 发布清单：`docs/RELEASE_CHECKLIST_v0.2.0-beta.md`
 - 10min 日志：`docs/TODO_10MIN.md`
 
@@ -30,7 +31,7 @@
 ## 5) 证据模板（复制填写）
 ```markdown
 ### [平台] Windows 11 / macOS 14 / Ubuntu 24.04
-- 构建来源：run 22716099630
+- 构建来源：run 22752777316
 - 安装包文件名：
 - 安装结果：PASS/FAIL
 - 首次向导结果：PASS/FAIL
@@ -50,11 +51,12 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-06 15:08 +08:00）
+### 当前跟进状态（2026-03-06 16:28 +08:00）
 - Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
 - macOS tester: 仍待指定（当前主要阻塞）。
-- CI 基线：最新 run `22752777316`（success，`fix(ci): detect macOS app bundles in smoke test`）；上一条 run `22752455106` 为 failed（`feat(P3): integrate all P3 features in frontend`）；最近发布验证成功基线 run `22726283117`（green）；历史失败样本 run `22728026668`（failed，macOS `bundle_dmg.sh` 打包失败）。
+- CI 基线：最新 run `22753822362`（success，docs-only traceability refresh）；最新包含 macOS `.app` smoke-check 修复的实质构建基线为 run `22752777316`（success）；最近失败样本 run `22752455106`（failed，根因已定位并修复：`scripts/smoke-test.sh` 误把 `.app` 目录当成缺失产物）；上一条发布验证成功基线 run `22726283117`（green）。
 - 本地校验：当前 slice 未新增本地编译动作，沿用 14:23 已确认的 `npm run build`（pass）与 `cargo check --manifest-path src-tauri/Cargo.toml`（pass）结果。
+- 说明：证据模板中的“构建来源”已统一更新到 run `22752777316`，避免测试人继续引用已过时的旧 run 号。
 - 阻塞：当前 cron/CLI 会话无法直接完成指定测试人的交互触达与证据回收，需在 Discord 交互面执行跟进并回填截图/日志链接。
 
 ## 7) 通过标准（Release Gate）
