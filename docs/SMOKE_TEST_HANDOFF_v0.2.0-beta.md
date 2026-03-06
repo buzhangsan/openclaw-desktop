@@ -51,13 +51,14 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-06 16:28 +08:00）
-- Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
-- macOS tester: 仍待指定（当前主要阻塞）。
-- CI 基线：最新 run `22753822362`（success，docs-only traceability refresh）；最新包含 macOS `.app` smoke-check 修复的实质构建基线为 run `22752777316`（success）；最近失败样本 run `22752455106`（failed，根因已定位并修复：`scripts/smoke-test.sh` 误把 `.app` 目录当成缺失产物）；上一条发布验证成功基线 run `22726283117`（green）。
-- 本地校验：当前 slice 未新增本地编译动作，沿用 14:23 已确认的 `npm run build`（pass）与 `cargo check --manifest-path src-tauri/Cargo.toml`（pass）结果。
-- 说明：证据模板中的“构建来源”已统一更新到 run `22752777316`，避免测试人继续引用已过时的旧 run 号。
-- 阻塞：当前 cron/CLI 会话无法直接完成指定测试人的交互触达与证据回收，需在 Discord 交互面执行跟进并回填截图/日志链接。
+### 当前跟进状态（2026-03-06 20:15 +08:00）
+- Windows (Zhangsan-PC): 节点当前在线且已配对，但本轮探测确认其仅暴露 `browser.proxy` / `system.which`，不支持 `system.run.prepare`，因此仍无法从当前 cron/CLI 会话直接代跑 Windows 冒烟；跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
+- macOS tester: `Zhangsan-MacBook` 节点当前离线，且人工测试人仍待指定（当前主要阻塞）。
+- CI 基线：最新 run `22755495785`（success，docs-only baseline refresh）；最新包含 macOS `.app` smoke-check 修复的实质构建基线仍为 run `22752777316`（success）；最近失败样本 run `22752455106`（failed，根因已定位并修复：`scripts/smoke-test.sh` 误把 `.app` 目录当成缺失产物）；上一条发布验证成功基线 run `22726283117`（green）。
+- CI 细项复核：run `22755495785` 的 macOS / Ubuntu / Windows 三个 build job 全部 success，当前没有新的 CI 回归信号。
+- 本地校验：上一轮已执行 `npm run build`（pass）与 `cargo check --manifest-path src-tauri/Cargo.toml`（pass），当前仓库仍满足本地构建/编译质量门。
+- 说明：证据模板继续保持 run `22752777316` 作为实质 smoke 构建来源，避免测试人误引用 docs-only run。
+- 阻塞：当前 cron/CLI 会话仍无法直接完成指定测试人的交互触达与证据回收；下一步必须在 Discord 交互面发送 Windows 跟进，并补齐 macOS 测试人后回填截图/日志链接。
 
 ## 7) 通过标准（Release Gate）
 - Windows + macOS 至少各 1 份 PASS 证据
