@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
+          - platform: 'macos-14'
             args: '--target universal-apple-darwin'
           - platform: 'ubuntu-22.04'
             args: ''
@@ -50,7 +50,7 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-14' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -61,9 +61,11 @@ jobs:
         run: npm install
 
       - name: Build Tauri app
+        id: tauri_build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MACOSX_DEPLOYMENT_TARGET: '10.15'
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'OpenClaw Desktop ${{ github.ref_name }}'
@@ -71,6 +73,41 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Retry macOS DMG if missing
+        if: matrix.platform == 'macos-14' && steps.tauri_build.outcome == 'success'
+        shell: bash
+        run: |
+          DMG_COUNT=$(find src-tauri/target -name "*.dmg" -type f 2>/dev/null | wc -l)
+          if [ "$DMG_COUNT" -eq 0 ]; then
+            echo "⚠️  No DMG found after build, retrying bundle creation..."
+            cd src-tauri
+            cargo install tauri-cli --version "^2" --locked 2>/dev/null || true
+            cargo tauri build --target universal-apple-darwin --bundles dmg 2>&1 || {
+              echo "❌ DMG retry also failed"
+              exit 1
+            }
+          else
+            echo "✅ DMG found ($DMG_COUNT file(s))"
+          fi
+
+      - name: Verify build artifacts
+        if: always()
+        shell: bash
+        run: |
+          echo "=== Artifact Verification ==="
+          PLATFORM="${{ matrix.platform }}"
+          case "$PLATFORM" in
+            macos-14)
+              find src-tauri/target -name "*.dmg" -type f -exec sh -c 'echo "✅ DMG: {} ($(du -h "{}" | cut -f1))"' \;
+              ;;
+            ubuntu-22.04)
+              find src-tauri/target \( -name "*.AppImage" -o -name "*.deb" \) -type f -exec sh -c 'echo "✅ {}"' \;
+              ;;
+            windows-latest)
+              find src-tauri/target \( -name "*.msi" -o -name "*.exe" \) -type f -exec sh -c 'echo "✅ {}"' \;
+              ;;
+          esac
 
       - name: Debug produced bundles
         if: always()
