@@ -14,8 +14,8 @@
 - Linux 测试人：当前维护者（可复测）
 
 ## 3) 测试输入与证据链接
-- CI run（最新绿灯）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22716099630
-- 备用 run：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22716088507
+- CI run（最近成功基线）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22726283117
+- CI run（最新失败样本，macOS DMG 打包）：https://github.com/buzhangsan/openclaw-desktop/actions/runs/22728026668
 - 发布清单：`docs/RELEASE_CHECKLIST_v0.2.0-beta.md`
 - 10min 日志：`docs/TODO_10MIN.md`
 
@@ -50,10 +50,10 @@
 文档模板位置：docs/SMOKE_TEST_HANDOFF_v0.2.0-beta.md（第5节）
 ```
 
-### 当前跟进状态（2026-03-06 00:55 +08:00）
+### 当前跟进状态（2026-03-06 10:23 +08:00）
 - Windows (Zhangsan-PC): 跟进文案已准备，待在可交互 Discord 线程中发送并收集回传证据。
 - macOS tester: 仍待指定（当前主要阻塞）。
-- CI 基线：latest run `22726283117`（green，无更新）；上一 run `22725862976`（green，top 5 runs 全绿）。
+- CI 基线：latest run `22728026668`（failed，macOS `bundle_dmg.sh` 打包失败）；最近成功 run `22726283117`（green，10:23 检查仍无新增 run）。
 - 阻塞：当前 cron/CLI 会话无法直接完成指定测试人的交互触达与证据回收，需在 Discord 交互面执行跟进并回填截图/日志链接。
 
 ## 7) 通过标准（Release Gate）
